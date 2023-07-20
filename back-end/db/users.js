@@ -13,7 +13,7 @@ async function registerUserInDB(username, password) {
           resolve(result);
         });
       });
-    //   await connection.end();
+      await connection.end();
       return result.insertId.toString();
     } catch (error) {
       console.log(error);
@@ -37,7 +37,7 @@ async function registerUserInDB(username, password) {
           resolve(result);
         });
       });
-    //   await connection.end();
+      await connection.end();
       return result[0].count > 0;
     } catch (error) {
       console.log(error);
@@ -56,7 +56,7 @@ async function registerUserInDB(username, password) {
           resolve(result);
         });
       });
-    //   await connection.end();
+      await connection.end();
       if (result.length === 0) {
         throw new UserDoesNotExistError(`Username does not exist: ${un}`);
       }
