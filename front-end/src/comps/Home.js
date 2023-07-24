@@ -45,7 +45,7 @@ function Home() {
         <Divider />
         <Flex minWidth="max-content" alignItems="center" gap="2">
           <Box p="2">
-            <Heading size='3xl'>Reciept Managing App</Heading>
+            <Heading size='3xl'>Nutrition Analysis</Heading>
           </Box>
           <Spacer />
           <Button size="lg" colorScheme="teal" onClick={handleLogout}>
