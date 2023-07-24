@@ -1,11 +1,11 @@
 const mysql = require("mysql2");
 
 var db_config = {
-  host: "gateway01.eu-central-1.prod.aws.tidbcloud.com",
+  host: "gateway01.us-west-2.prod.aws.tidbcloud.com",
   port: 4000,
-  user: "3tct5ZhdBXiMUDP.root",
-  password: "FaZ24NgO4jZfQnWu",
-  database: "recipt",
+  user: "2zN8pZsdS5CoC4Q.root",
+  password: "9YzrqOVUrJlmUH2u",
+  database: "Nutrition",
   ssl: {
     minVersion: "TLSv1.2",
     rejectUnauthorized: true,

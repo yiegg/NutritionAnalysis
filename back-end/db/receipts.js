@@ -6,7 +6,7 @@ async function addReceiptInDB(doc) {
     try {
         const connection = await client.createConnection();
         const result = await connection.execute(`
-      INSERT INTO receipt (
+      INSERT INTO info (
         _id, userID, contentType, fileName, bucketFileName, imageURL, dateAdded, dateLastModified, analyzedResults
       ) VALUES (
         ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -27,7 +27,7 @@ async function addReceiptInDB(doc) {
 async function getReceiptInDB(receiptID) {
     try {
         const connection = await client.createConnection();
-        const sql = 'SELECT * FROM receipt WHERE _id = ?';
+        const sql = 'SELECT * FROM info WHERE _id = ?';
         const result = await new Promise((resolve, reject) => {
             connection.query(sql, [receiptID], function (err, result) {
                 if (err) reject(err);
@@ -53,7 +53,7 @@ async function getReceiptInDB(receiptID) {
 async function removeReceiptInDB(receiptID) {
     try {
         const connection = await client.createConnection();
-        const sql = 'DELETE FROM receipt WHERE _id = ?';
+        const sql = 'DELETE FROM info WHERE _id = ?';
         const result = await new Promise((resolve, reject) => {
             connection.query(sql, [receiptID], function (err, result) {
                 if (err) reject(err);
@@ -76,9 +76,9 @@ async function getReceiptsByUserIdInDB(userID) {
         const connection = await client.createConnection();
 
         const getReceiptsQuery = `
-        SELECT r.*
-        FROM receipt r
-        JOIN user ur ON r.userID = ur._id
+        SELECT i.*
+        FROM info i
+        JOIN users ur ON i.userID = ur._id
         WHERE ur._id = ?
       `;
         const getReceiptsParams = [userID];
@@ -103,7 +103,7 @@ async function getReceiptByUserIDAndBucketFileNameInDB(userID, bucketFileName) {
     try {
         const connection = await client.createConnection();
 
-        const query = 'SELECT * FROM receipt WHERE userID = ? AND bucketFileName = ?';
+        const query = 'SELECT * FROM info WHERE userID = ? AND bucketFileName = ?';
         const params = [userID, bucketFileName];
 
         const result = await new Promise((resolve, reject) => {
@@ -132,7 +132,7 @@ async function updateReceiptInDB(receiptID, updatedFieldsDoc) {
     try {
       const connection = await client.createConnection();
   
-      const query = 'UPDATE receipt SET dateLastModified = ?, analyzedResults = ? WHERE _id = ?';
+      const query = 'UPDATE info SET dateLastModified = ?, analyzedResults = ? WHERE _id = ?';
       const params = [
         updatedFieldsDoc.dateLastModified,
         JSON.stringify(updatedFieldsDoc.analyzedResults),

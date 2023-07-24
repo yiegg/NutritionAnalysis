@@ -6,14 +6,14 @@ const mysql = require('mysql2/promise');
 async function registerUserInDB(username, password) {
     try {
       const connection = await createConnection();
-      const sql = 'INSERT INTO user (_id, username, password) VALUES (?, ?, ?)';
+      const sql = 'INSERT INTO users (_id, userName, password) VALUES (?, ?, ?)';
       const result = await new Promise((resolve, reject) => {
         connection.query(sql, [uuidv4(), username, password], function (err, result) {
           if (err) reject(err);
           resolve(result);
         });
       });
-      await connection.end();
+      //await connection.end();
       return result.insertId.toString();
     } catch (error) {
       console.log(error);
@@ -30,7 +30,7 @@ async function registerUserInDB(username, password) {
   async function checkUsernameExistenceInDB(username) {
     try {
       const connection = await createConnection();
-      const sql = 'SELECT COUNT(*) AS count FROM user WHERE username = ?';
+      const sql = 'SELECT COUNT(*) AS count FROM users WHERE userName = ?';
       const result = await new Promise((resolve, reject) => {
         connection.query(sql, [username], function (err, result) {
           if (err) reject(err);
@@ -49,7 +49,7 @@ async function registerUserInDB(username, password) {
   async function getUserByUsernameInDB(un) {
     try {
       const connection = await createConnection();
-      const sql = 'SELECT * FROM user WHERE username = ?';
+      const sql = 'SELECT * FROM users WHERE userName = ?';
       const result = await new Promise((resolve, reject) => {
         connection.query(sql, [un], function (err, result) {
           if (err) reject(err);

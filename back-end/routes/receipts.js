@@ -69,7 +69,9 @@ let modifiedReceiptContentFilter = (req, res, next) => {
 let userAddReceiptRoute = async (req, res) => { // Probably add a middleware to process the record metadata.
     const userID = req.user.userID;
     const requestBody = req.body;
-    const contentType = getContentType(requestBody.fileType);
+    // const contentType = getContentType(requestBody.fileType);
+    const contentType = 'image/png';
+    console.log(requestBody);
     const bucketFileName = requestBody.bucketFileName;
     const fileName = bucketFileName.substring(37);
     const dateAdded = new Date();

@@ -19,7 +19,7 @@ const {DocumentProcessorServiceClient} =
 // apiEndpoint regions available: eu-documentai.googleapis.com, us-documentai.googleapis.com (Required if using eu based processor)
 // const client = new DocumentProcessorServiceClient({apiEndpoint: 'eu-documentai.googleapis.com'});
 const client = new DocumentProcessorServiceClient({apiEndpoint: 'us-documentai.googleapis.com'});
-
+// console.log(client);
 async function analyzeFileByDocumentAI(userID, fileName, contentType) {
   const encodedImage = await cloudStorageEncodedFileProvider(userID, fileName);
 
@@ -30,7 +30,7 @@ async function analyzeFileByDocumentAI(userID, fileName, contentType) {
       mimeType: contentType,
     },
   };
-
+  //console.log(request);
   // Recognizes text entities in the PDF document
   let result;
   try {
@@ -40,6 +40,7 @@ async function analyzeFileByDocumentAI(userID, fileName, contentType) {
     throw new Error("Error in processDocument() in analyzeFileByDocumentAI()!");
   }
   const {document} = result;
+  // console.log(document);
 
   // Get all of the document text as one big string
   const {entities} = document;
