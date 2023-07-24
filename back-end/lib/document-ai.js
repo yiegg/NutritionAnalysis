@@ -12,6 +12,7 @@ const processorId = process.env.DOCUMENT_AI_PROCESSOR_ID; // Create processor in
 // You must create new processors in the Cloud Console first
 const name = `projects/${projectId}/locations/${location}/processors/${processorId}`;
 
+
 const {DocumentProcessorServiceClient} =
   require('@google-cloud/documentai').v1;
 
@@ -48,7 +49,7 @@ async function analyzeFileByDocumentAI(userID, fileName, contentType) {
   return {entities, selectedEntities: extractEntities(entities)};
 }
 
-const matchEntityTypes = ['supplier_name', 'supplier_address', 'supplier_phone', 'invoice_date', 'net_amount', 'total_tax_amount', 'total_amount', 'currency', 'invoice_type'];
+const matchEntityTypes = ['AMOUNT', 'CALORIES', 'CARBOHYDRATE', 'FAT', 'PROTEIN', 'SODIUM'];
 const lineItemEntityTypes = ['description', 'amount', 'quantity', 'unit_price'];
 const numberEntityTypes = ['net_amount', 'total_tax_amount', 'total_amount', 'amount', 'quantity', 'unit_price'];
 const priceEntityTypes = ['net_amount', 'total_tax_amount', 'total_amount', 'amount', 'unit_price'];
@@ -58,50 +59,46 @@ function extractEntities(entities) {
   let lineItemEntities = [];
   for (const entity of entities) {
       const type = entity.type;
-      if (! matchEntityTypes.includes(type) && type !== 'line_item') {
+      if (! matchEntityTypes.includes(type)) {
         continue;
-      } else if (type === 'invoice_date' || type === 'invoice_type') {
-        selectedEntities[type] = entity.normalizedValue.text;
-      } else if (matchEntityTypes.includes(type)) {
-        selectedEntities[type] = entity.mentionText || entity.normalizedValue.text;
-      } else if (type === 'line_item') {
-        lineItemEntities.push({
-            lineItemString: entity.mentionText || entity.normalizedValue.text,
-            lineItemProperties: entity.properties
-        });
-      } else {
-        console.log(`Unhandled entity ${entity}.`)
       }
+      selectedEntities[type] = entity.mentionText || entity.normalizedValue.text;
   }
-  selectedEntities['line_items'] = [];
-  for (const entity of lineItemEntities) {
-      let currentLineItemEntity = getNullLineItemObject();
-      const lineItemString = entity.lineItemString;
-      const lineItemProperties = entity.lineItemProperties;
-      currentLineItemEntity['line_string'] = lineItemString;
-      for (const property of lineItemProperties) {
-          const type = property.type;
-          const value = property.mentionText || property.normalizedValue.text;
-          switch (type) {
-              case "line_item/quantity":
-                  currentLineItemEntity['quantity'] = value;
-                  break;
-              case "line_item/description":
-                  if (currentLineItemEntity['description']) {
-                      currentLineItemEntity['description'] += ' ';
-                  }
-                  currentLineItemEntity['description'] += value;
-                  break;
-              case "line_item/unit_price":
-                  currentLineItemEntity['unit_price'] = value;
-                  break;
-              case "line_item/amount":
-                  currentLineItemEntity['amount'] = value;
-                  break;
-          }
-      }
-      selectedEntities['line_items'].push(currentLineItemEntity);
-  }
+
+
+
+
+    
+  
+  // selectedEntities['line_items'] = [];
+  // for (const entity of lineItemEntities) {
+  //     let currentLineItemEntity = getNullLineItemObject();
+  //     const lineItemString = entity.lineItemString;
+  //     const lineItemProperties = entity.lineItemProperties;
+  //     currentLineItemEntity['line_string'] = lineItemString;
+  //     for (const property of lineItemProperties) {
+  //         const type = property.type;
+  //         const value = property.mentionText || property.normalizedValue.text;
+  //         switch (type) {
+  //             case "line_item/quantity":
+  //                 currentLineItemEntity['quantity'] = value;
+  //                 break;
+  //             case "line_item/description":
+  //                 if (currentLineItemEntity['description']) {
+  //                     currentLineItemEntity['description'] += ' ';
+  //                 }
+  //                 currentLineItemEntity['description'] += value;
+  //                 break;
+  //             case "line_item/unit_price":
+  //                 currentLineItemEntity['unit_price'] = value;
+  //                 break;
+  //             case "line_item/amount":
+  //                 currentLineItemEntity['amount'] = value;
+  //                 break;
+  //         }
+  //     }
+  //     selectedEntities['line_items'].push(currentLineItemEntity);
+  // }
   return selectedEntities;
 }
 
@@ -116,3 +113,4 @@ function getNullLineItemObject() {
 }
 
 module.exports = {analyzeFileByDocumentAI, matchEntityTypes, lineItemEntityTypes, numberEntityTypes, priceEntityTypes};
+
