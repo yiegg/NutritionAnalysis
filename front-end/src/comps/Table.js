@@ -19,25 +19,13 @@ export default function Table({ setImg, receipts }) {
 
   async function getDocs() {
     const extractedData = receipts.map((receipt) => ({
-      amount: receipt.analyzedResults.total_amount,
-      description: (() => {
-        const items = receipt.analyzedResults.line_items;
-        let qxi = items.map(
-          (item) => `${item.quantity || 1} x ${item.description}`
-        );
-        return (
-          <ul>
-            {qxi.map((detail) => (
-              <li>{detail}</li>
-            ))}
-          </ul>
-        );
-      })(),
-      date: (() => {
-        const dateString = receipt.analyzedResults.invoice_date;
-        return dateString;
-      })(),
-      vendor: receipt.analyzedResults.supplier_name,
+      amount: receipt.analyzedResults.AMOUNT,
+      calories: receipt.analyzedResults.CALORIES,
+      carbonhydrate: receipt.analyzedResults.CARBOHYDRATE,
+      fat: receipt.analyzedResults.FAT,
+      protein: receipt.analyzedResults.PROTEIN,
+      sodium: receipt.analyzedResults.SODIUM,
+      date: receipt.dateAdded,
       url: (
         <img
           src={receipt.imageURL}
@@ -84,9 +72,12 @@ export default function Table({ setImg, receipts }) {
       data.map((item) => (
         <Tr key={item.id}>
           <Td>{item.date}</Td>
-          <Td>{item.vendor}</Td>
-          <Td>{item.description}</Td>
           <Td>{item.amount}</Td>
+          <Td>{item.calories}</Td>
+          <Td>{item.carbonhydrate}</Td>
+          <Td>{item.fat}</Td>
+          <Td>{item.protein}</Td>
+          <Td>{item.sodium}</Td>
           <Td>{item.url}</Td>
           <Td>
             <Button
@@ -108,9 +99,12 @@ export default function Table({ setImg, receipts }) {
           <Thead>
             <Tr>
               <Th>Date</Th>
-              <Th>Vendor</Th>
-              <Th>Description</Th>
               <Th>Amount</Th>
+              <Th>Calories</Th>
+              <Th>Carbonhydrate</Th>
+              <Th>Fat</Th>
+              <Th>Protein</Th>
+              <Th>Sodium</Th>
               <Th>Image</Th>
               <Th/>
             </Tr>

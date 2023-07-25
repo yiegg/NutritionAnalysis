@@ -39,6 +39,10 @@ function Home() {
     fetchRecords();
   }, []);
 
+  useEffect(() => {
+    console.log(receipts);
+  }, [receipts])
+
   return (
     receipts && (
       <div className="App">
