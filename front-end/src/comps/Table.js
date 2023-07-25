@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import URL from "../config/URLConfig";
 import { DeleteIcon } from "@chakra-ui/icons";
@@ -12,10 +11,15 @@ import {
   Th,
   Td,
   TableContainer,
+  Select,
 } from "@chakra-ui/react";
 
 export default function Table({ setImg, receipts }) {
   const [data, setData] = useState(null);
+
+  useEffect(() => {
+    getDocs();
+  }, [receipts]);
 
   async function getDocs() {
     const extractedData = receipts.map((receipt) => ({
@@ -36,13 +40,13 @@ export default function Table({ setImg, receipts }) {
           height="200"
         />
       ),
-      id: receipt._id
+      id: receipt._id,
+      multiplier: 1, // Default multiplier is set to 1
     }));
     setData(extractedData);
-    // window.location.reload();
   }
 
-  async function deletRequest(id) {
+  async function deleteRequest(id) {
     try {
       const JWT = sessionStorage.getItem("bookKeepingCredential");
       await axios.delete(URL + "receipts/" + id, {
@@ -57,14 +61,17 @@ export default function Table({ setImg, receipts }) {
     }
   }
 
-  //Calls function only once (when it is onMount)
-  function handleClick(id) {
-    deletRequest(id);
+  function handleMultiplierChange(id, multiplier) {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.id === id ? { ...item, multiplier } : item
+      )
+    );
   }
 
-  useEffect(() => {
-    getDocs();
-  }, [receipts]);
+  function handleDelete(id) {
+    deleteRequest(id);
+  }
 
   const dataTable =
     data == null ? (
@@ -73,22 +80,34 @@ export default function Table({ setImg, receipts }) {
       data.map((item) => (
         <Tr key={item.id}>
           <Td>{item.fileName.slice(0, -5)}</Td>
-          <Td>{item.date.substring(0,10)}</Td>
-          <Td>{item.amount || '-'}</Td>
-          <Td>{item.calories || '-'}</Td>
-          <Td>{item.carbonhydrate || '-'}</Td>
-          <Td>{item.fat || '-'}</Td>
-          <Td>{item.protein || '-'}</Td>
-          <Td>{item.sodium || '-'}</Td>
+          <Td>{item.date.substring(0, 10)}</Td>
+          <Td>{item.amount || "-"}</Td>
+          <Td>{item.calories * item.multiplier || "-"}</Td>
+          <Td>{item.carbonhydrate * item.multiplier || "-"}</Td>
+          <Td>{item.fat * item.multiplier || "-"}</Td>
+          <Td>{item.protein * item.multiplier || "-"}</Td>
+          <Td>{item.sodium * item.multiplier || "-"}</Td>
           <Td>{item.url}</Td>
           <Td>
             <Button
               colorScheme="red"
               variant="outline"
-              onClick={() => handleClick(item.id)}
+              onClick={() => handleDelete(item.id)}
             >
               <DeleteIcon />
             </Button>
+          </Td>
+          <Td>
+            <Select
+              value={item.multiplier}
+              onChange={(e) =>
+                handleMultiplierChange(item.id, parseInt(e.target.value))
+              }
+            >
+              <option value={1}>x1</option>
+              <option value={2}>x2</option>
+              <option value={3}>x3</option>
+            </Select>
           </Td>
         </Tr>
       ))
@@ -109,7 +128,8 @@ export default function Table({ setImg, receipts }) {
               <Th>Protein</Th>
               <Th>Sodium</Th>
               <Th>Image</Th>
-              <Th/>
+              <Th>Delete</Th>
+              <Th>Multiplier</Th> 
             </Tr>
           </Thead>
           <Tbody>{dataTable}</Tbody>
