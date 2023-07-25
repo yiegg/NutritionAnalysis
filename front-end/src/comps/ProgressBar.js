@@ -1,12 +1,11 @@
-import { Box } from '@chakra-ui/react'
-import { Progress } from '@chakra-ui/react'
+import { Box } from "@chakra-ui/react";
+import { Progress } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import axios from "axios";
 import URL from "../config/URLConfig";
 
 export default function ProgressBar({ file, setFile, setStatus }) {
   // TO-DO replace with real post HTTP request
-  const bucketFileName = useRef("");
   async function uploadReceipt(receipt) {
     try {
       setStatus("Uploading receipt~");
@@ -19,17 +18,19 @@ export default function ProgressBar({ file, setFile, setStatus }) {
           },
         }
       );
-      bucketFileName.current = storageInfo.data.bucketFileName;
+      const bucketFileName = storageInfo.data.bucketFileName;
       const url = storageInfo.data.url;
+
       let uploadRes = await axios.put(url, receipt, {
         headers: {
           "Content-Type": "application/octet-stream",
         },
       });
+
       setStatus("AI analyzing receipt~");
       let analyzeRes = await axios.post(
         URL + "receipts/",
-        { bucketFileName: bucketFileName.current, fileType: "png" },
+        { bucketFileName: bucketFileName, fileType: "png" },
         {
           headers: {
             Authorization: `Bearer ${JWT}`,
@@ -52,7 +53,7 @@ export default function ProgressBar({ file, setFile, setStatus }) {
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Progress isIndeterminate/>
+      <Progress isIndeterminate />
     </Box>
   );
 }
