@@ -71,13 +71,14 @@ export default function Table({ setImg, receipts }) {
     ) : (
       data.map((item) => (
         <Tr key={item.id}>
-          <Td>{item.date}</Td>
-          <Td>{item.amount}</Td>
-          <Td>{item.calories}</Td>
-          <Td>{item.carbonhydrate}</Td>
-          <Td>{item.fat}</Td>
-          <Td>{item.protein}</Td>
-          <Td>{item.sodium}</Td>
+          <Td>{item.name}</Td>
+          <Td>{item.date.substring(0,10)}</Td>
+          <Td>{item.amount || '-'}</Td>
+          <Td>{item.calories || '-'}</Td>
+          <Td>{item.carbonhydrate || '-'}</Td>
+          <Td>{item.fat || '-'}</Td>
+          <Td>{item.protein || '-'}</Td>
+          <Td>{item.sodium || '-'}</Td>
           <Td>{item.url}</Td>
           <Td>
             <Button
@@ -98,6 +99,7 @@ export default function Table({ setImg, receipts }) {
         <UITable variant="striped" size="lg">
           <Thead>
             <Tr>
+              <Th>Food</Th>
               <Th>Date</Th>
               <Th>Amount</Th>
               <Th>Calories</Th>
