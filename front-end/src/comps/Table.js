@@ -26,6 +26,7 @@ export default function Table({ setImg, receipts }) {
       protein: receipt.analyzedResults.PROTEIN,
       sodium: receipt.analyzedResults.SODIUM,
       date: receipt.dateAdded,
+      fileName: receipt.fileName,
       url: (
         <img
           src={receipt.imageURL}
@@ -71,7 +72,7 @@ export default function Table({ setImg, receipts }) {
     ) : (
       data.map((item) => (
         <Tr key={item.id}>
-          <Td>{item.name}</Td>
+          <Td>{item.fileName.slice(0, -5)}</Td>
           <Td>{item.date.substring(0,10)}</Td>
           <Td>{item.amount || '-'}</Td>
           <Td>{item.calories || '-'}</Td>
