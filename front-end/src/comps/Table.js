@@ -15,37 +15,46 @@ import {
 } from "@chakra-ui/react";
 import TableItem from "./TableItem";
 
-export default function Table({ setImg, receipts }) {
+export default function Table({ setImg, receipts, onAmount }) {
   const [data, setData] = useState(null);
 
   useEffect(() => {
+    async function getDocs() {
+      const extractedData = receipts.map((receipt) => ({
+        amount: receipt.analyzedResults.AMOUNT,
+        calories: receipt.analyzedResults.CALORIES,
+        carbonhydrate: receipt.analyzedResults.CARBOHYDRATE,
+        fat: receipt.analyzedResults.FAT,
+        protein: receipt.analyzedResults.PROTEIN,
+        sodium: receipt.analyzedResults.SODIUM,
+        date: new Date(receipt.dateAdded).toLocaleDateString(),
+        fileName: receipt.fileName,
+        url: (
+          <img
+            src={receipt.imageURL}
+            alt="receipt photo"
+            onClick={() => setImg(receipt.imageURL)}
+            width="200"
+            height="200"
+          />
+        ),
+        id: receipt._id,
+        multiplier: localStorage.getItem(receipt.fileName.toString()) || 1, // Default multiplier is set to 1
+      }));
+      setData(extractedData);
+    }
     getDocs();
-  }, [receipts]);
+  }, [receipts, setImg]);
 
-  async function getDocs() {
-    const extractedData = receipts.map((receipt) => ({
-      amount: receipt.analyzedResults.AMOUNT,
-      calories: receipt.analyzedResults.CALORIES,
-      carbonhydrate: receipt.analyzedResults.CARBOHYDRATE,
-      fat: receipt.analyzedResults.FAT,
-      protein: receipt.analyzedResults.PROTEIN,
-      sodium: receipt.analyzedResults.SODIUM,
-      date: receipt.dateAdded,
-      fileName: receipt.fileName,
-      url: (
-        <img
-          src={receipt.imageURL}
-          alt="receipt photo"
-          onClick={() => setImg(receipt.imageURL)}
-          width="200"
-          height="200"
-        />
-      ),
-      id: receipt._id,
-      multiplier: localStorage.getItem(receipt.fileName.toString()) || 1, // Default multiplier is set to 1
-    }));
-    setData(extractedData);
-  }
+  useEffect(() => {
+    if (!data) return;
+    onAmount(
+      data.reduce(
+        (pre, curr) => pre + Number(curr.calories * curr.multiplier),
+        0
+      )
+    );
+  }, [onAmount, data]);
 
   const dataTable =
     data == null ? (
@@ -57,7 +66,7 @@ export default function Table({ setImg, receipts }) {
   return (
     data && (
       <TableContainer>
-        <UITable variant="striped" size="lg">
+        <UITable variant="striped" size="sm">
           <Thead>
             <Tr>
               <Th>Food</Th>

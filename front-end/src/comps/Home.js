@@ -12,6 +12,7 @@ import {
   Divider,
   Heading,
   Spacer,
+  Center,
 } from "@chakra-ui/react";
 
 function Home() {
@@ -27,7 +28,7 @@ function Home() {
       },
     });
     setReceipts(rawRecords.data.receiptRecords);
-    setAmount(rawRecords.data.expenseSummary.expenseSum);
+    // setAmount(rawRecords.data.expenseSummary.expenseSum);
   }
 
   const handleLogout = () => {
@@ -41,27 +42,34 @@ function Home() {
 
   useEffect(() => {
     console.log(receipts);
-  }, [receipts])
+  }, [receipts]);
 
   return (
     receipts && (
-      <div className="App">
-        <Divider />
-        <Flex minWidth="max-content" alignItems="center" gap="2">
-          <Box p="2">
-            <Heading size='3xl'>Nutrition Analysis</Heading>
-          </Box>
-          <Spacer />
-          <Button size="lg" colorScheme="teal" onClick={handleLogout}>
-            Sign Out
-          </Button>
+      <Flex w={"100%"} p={10} alignContent={"center"} justifyContent={"center"}>
+        <Flex
+          w={"80%"}
+          direction={"column"}
+          alignContent={"center"}
+          justifyContent={"center"}
+        >
+          <Divider />
+          <Flex minWidth="max-content" alignItems="center" gap="2">
+            <Box p="2">
+              <Heading size="3xl">Nutrition Analysis</Heading>
+            </Box>
+            <Spacer />
+            <Button size="lg" colorScheme="teal" onClick={handleLogout}>
+              Sign Out
+            </Button>
+          </Flex>
+          <Divider />
+          <Title amount={amount} />
+          <UploadForm />
+          <Table setImg={setImg} receipts={receipts} onAmount={setAmount} />
+          {img && <Modal src={img} setImg={setImg} />}
         </Flex>
-        <Divider />
-        <Title amount={amount} />
-        <UploadForm />
-        <Table setImg={setImg} receipts={receipts} />
-        {img && <Modal src={img} setImg={setImg} />}
-      </div>
+      </Flex>
     )
   );
 }
