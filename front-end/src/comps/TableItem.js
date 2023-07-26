@@ -33,19 +33,27 @@ const TableItem = ({ item }) => {
     deleteRequest(id);
   }
 
+  const calculatedCalories = item.calories * multiplier || "-";
+  const calculatedCarbonhydrate = item.carbonhydrate * multiplier || "-";
+  const calculatedFat = item.fat * multiplier || "-";
+  const calculatedProtein = item.protein * multiplier || "-";
+  const calculatedSodium = item.sodium * multiplier || "-";
+
   useEffect(() => {
     localStorage.setItem(item.fileName.toString(), multiplier);
   }, [item.fileName, multiplier]);
+
+
   return (
     <Tr key={item.id}>
       <Td>{item.fileName.slice(0, -5)}</Td>
       <Td>{item.date.substring(0, 10)}</Td>
       <Td>{item.amount || "-"}</Td>
-      <Td>{item.calories * item.multiplier || "-"}</Td>
-      <Td>{item.carbonhydrate * item.multiplier || "-"}</Td>
-      <Td>{item.fat * item.multiplier || "-"}</Td>
-      <Td>{item.protein * item.multiplier || "-"}</Td>
-      <Td>{item.sodium * item.multiplier || "-"}</Td>
+      <Td>{calculatedCalories}</Td>
+      <Td>{calculatedCarbonhydrate}</Td>
+      <Td>{calculatedFat}</Td>
+      <Td>{calculatedProtein}</Td>
+      <Td>{calculatedSodium}</Td>
       <Td>{item.url}</Td>
       <Td>
         <Button
