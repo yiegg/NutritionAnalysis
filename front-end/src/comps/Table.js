@@ -13,6 +13,7 @@ import {
   TableContainer,
   Select,
 } from "@chakra-ui/react";
+import TableItem from "./TableItem";
 
 export default function Table({ setImg, receipts }) {
   const [data, setData] = useState(null);
@@ -41,76 +42,16 @@ export default function Table({ setImg, receipts }) {
         />
       ),
       id: receipt._id,
-      multiplier: 1, // Default multiplier is set to 1
+      multiplier: localStorage.getItem(receipt.fileName.toString()) || 1, // Default multiplier is set to 1
     }));
     setData(extractedData);
-  }
-
-  async function deleteRequest(id) {
-    try {
-      const JWT = sessionStorage.getItem("bookKeepingCredential");
-      await axios.delete(URL + "receipts/" + id, {
-        headers: {
-          Authorization: `Bearer ${JWT}`,
-        },
-      });
-      alert("Receipt removed successfully!");
-      setTimeout(() => window.location.reload(), 500);
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-
-  function handleMultiplierChange(id, multiplier) {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id ? { ...item, multiplier } : item
-      )
-    );
-  }
-
-  function handleDelete(id) {
-    deleteRequest(id);
   }
 
   const dataTable =
     data == null ? (
       <></>
     ) : (
-      data.map((item) => (
-        <Tr key={item.id}>
-          <Td>{item.fileName.slice(0, -5)}</Td>
-          <Td>{item.date.substring(0, 10)}</Td>
-          <Td>{item.amount || "-"}</Td>
-          <Td>{item.calories * item.multiplier || "-"}</Td>
-          <Td>{item.carbonhydrate * item.multiplier || "-"}</Td>
-          <Td>{item.fat * item.multiplier || "-"}</Td>
-          <Td>{item.protein * item.multiplier || "-"}</Td>
-          <Td>{item.sodium * item.multiplier || "-"}</Td>
-          <Td>{item.url}</Td>
-          <Td>
-            <Button
-              colorScheme="red"
-              variant="outline"
-              onClick={() => handleDelete(item.id)}
-            >
-              <DeleteIcon />
-            </Button>
-          </Td>
-          <Td>
-            <Select
-              value={item.multiplier}
-              onChange={(e) =>
-                handleMultiplierChange(item.id, parseInt(e.target.value))
-              }
-            >
-              <option value={1}>x1</option>
-              <option value={2}>x2</option>
-              <option value={3}>x3</option>
-            </Select>
-          </Td>
-        </Tr>
-      ))
+      data.map((item) => <TableItem item={item} key={item.id} />)
     );
 
   return (
@@ -129,7 +70,7 @@ export default function Table({ setImg, receipts }) {
               <Th>Sodium</Th>
               <Th>Image</Th>
               <Th>Delete</Th>
-              <Th>Multiplier</Th> 
+              <Th>Multiplier</Th>
             </Tr>
           </Thead>
           <Tbody>{dataTable}</Tbody>
