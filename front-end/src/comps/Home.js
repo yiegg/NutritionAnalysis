@@ -1,18 +1,11 @@
-import { useEffect, useState } from "react";
-import Title from "./Title";
-import UploadForm from "./UploadForm";
-import Table from "./Table";
-import Modal from "./Modal";
-import URL from "../config/URLConfig";
-import axios from "axios";
-import {
-  Button,
-  Flex,
-  Box,
-  Divider,
-  Heading,
-  Spacer,
-} from "@chakra-ui/react";
+import { useEffect, useState } from 'react';
+import Title from './Title';
+import UploadForm from './UploadForm';
+import Table from './Table';
+import Modal from './Modal';
+import URL from '../config/URLConfig';
+import axios from 'axios';
+import { Button, Flex, Box, Divider, Heading, Spacer } from '@chakra-ui/react';
 
 function Home() {
   const [img, setImg] = useState(null);
@@ -20,8 +13,8 @@ function Home() {
   const [amount, setAmount] = new useState(0);
 
   async function fetchRecords() {
-    const JWT = sessionStorage.getItem("bookKeepingCredential");
-    const rawRecords = await axios.get(URL + "receipts", {
+    const JWT = sessionStorage.getItem('bookKeepingCredential');
+    const rawRecords = await axios.get(URL + 'receipts', {
       headers: {
         Authorization: `Bearer ${JWT}`,
       },
@@ -31,8 +24,8 @@ function Home() {
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem("bookKeepingCredential");
-    window.location.href = "/Login";
+    sessionStorage.removeItem('bookKeepingCredential');
+    window.location.href = '/Login';
   };
 
   useEffect(() => {
@@ -41,7 +34,7 @@ function Home() {
 
   useEffect(() => {
     console.log(receipts);
-  }, [receipts])
+  }, [receipts]);
 
   return (
     receipts && (
@@ -49,15 +42,15 @@ function Home() {
         <Divider />
         <Flex minWidth="max-content" alignItems="center" gap="2">
           <Box p="2">
-            <Heading size='3xl'>Nutrition Analysis</Heading>
+            <Heading size="3xl">Nutrition Analysis</Heading>
           </Box>
           <Spacer />
-          <Button size="lg" colorScheme="teal" onClick={handleLogout}>
+          <Button size="lg" colorScheme="pink" onClick={handleLogout}>
             Sign Out
           </Button>
         </Flex>
         <Divider />
-        <Title amount={amount} />
+        <Title amount={amount} className="bg-rouse-200" />
         <UploadForm />
         <Table setImg={setImg} receipts={receipts} />
         {img && <Modal src={img} setImg={setImg} />}
