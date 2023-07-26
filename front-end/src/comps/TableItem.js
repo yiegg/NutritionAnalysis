@@ -3,7 +3,7 @@ import { Button, Select, Td, Tr } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-const TableItem = ({ item }) => {
+const TableItem = ({ item, onMultiplierChange }) => {
   const [multiplier, setMultiplier] = useState(
     localStorage.getItem(item.fileName) || 1
   );
@@ -41,6 +41,7 @@ const TableItem = ({ item }) => {
 
   useEffect(() => {
     localStorage.setItem(item.fileName.toString(), multiplier);
+    onMultiplierChange(item.id, multiplier); 
   }, [item.fileName, multiplier]);
 
 

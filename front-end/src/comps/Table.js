@@ -48,19 +48,26 @@ export default function Table({ setImg, receipts, onAmount }) {
 
   useEffect(() => {
     if (!data) return;
-    onAmount(
-      data.reduce(
-        (pre, curr) => pre + Number(curr.calories * curr.multiplier),
-        0
+    const totalCalories = data.reduce(
+      (pre, curr) => pre + Number(curr.calories * curr.multiplier),
+      0
+    );
+    onAmount(totalCalories);
+  }, [onAmount, data]);
+
+  function handleMultiplierChange(itemId, multiplier) {
+    setData((prevData) =>
+      prevData.map((item) =>
+        item.id === itemId ? { ...item, multiplier } : item
       )
     );
-  }, [onAmount, data]);
+  }
 
   const dataTable =
     data == null ? (
       <></>
     ) : (
-      data.map((item) => <TableItem item={item} key={item.id} />)
+      data.map((item) => <TableItem item={item} key={item.id}  onMultiplierChange={handleMultiplierChange} />)
     );
 
   return (
