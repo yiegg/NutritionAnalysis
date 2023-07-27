@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import URL from "../config/URLConfig";
-import { DeleteIcon } from "@chakra-ui/icons";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import URL from '../config/URLConfig';
+import { DeleteIcon } from '@chakra-ui/icons';
 import {
   Button,
   Table as UITable,
@@ -12,8 +12,9 @@ import {
   Td,
   TableContainer,
   Select,
-} from "@chakra-ui/react";
-import TableItem from "./TableItem";
+  TableCaption,
+} from '@chakra-ui/react';
+import TableItem from './TableItem';
 
 export default function Table({ setImg, receipts, onAmount }) {
   const [data, setData] = useState(null);
@@ -50,16 +51,14 @@ export default function Table({ setImg, receipts, onAmount }) {
     if (!data) return;
     const totalCalories = data.reduce(
       (pre, curr) => pre + Number(curr.calories * curr.multiplier),
-      0
+      0,
     );
     onAmount(totalCalories);
   }, [onAmount, data]);
 
   function handleMultiplierChange(itemId, multiplier) {
     setData((prevData) =>
-      prevData.map((item) =>
-        item.id === itemId ? { ...item, multiplier } : item
-      )
+      prevData.map((item) => (item.id === itemId ? { ...item, multiplier } : item)),
     );
   }
 
@@ -67,7 +66,9 @@ export default function Table({ setImg, receipts, onAmount }) {
     data == null ? (
       <></>
     ) : (
-      data.map((item) => <TableItem item={item} key={item.id}  onMultiplierChange={handleMultiplierChange} />)
+      data.map((item) => (
+        <TableItem item={item} key={item.id} onMultiplierChange={handleMultiplierChange} />
+      ))
     );
 
   return (
