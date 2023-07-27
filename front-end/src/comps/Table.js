@@ -77,6 +77,9 @@ export default function Table({ setImg, receipts, onAmount }) {
         <UITable variant="striped" size="sm">
           <Thead>
             <Tr>
+              <Th>Delete</Th>
+              <Th>Image</Th>
+              <Th># of Unit</Th>
               <Th>Food</Th>
               <Th>Date</Th>
               <Th>Amount</Th>
@@ -85,9 +88,6 @@ export default function Table({ setImg, receipts, onAmount }) {
               <Th>Fat</Th>
               <Th>Protein</Th>
               <Th>Sodium</Th>
-              <Th>Image</Th>
-              <Th>Delete</Th>
-              <Th>Multiplier</Th>
             </Tr>
           </Thead>
           <Tbody>{dataTable}</Tbody>
