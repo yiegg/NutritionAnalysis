@@ -23,12 +23,12 @@ function LoginPage() {
   const [credential, setCredential] = useState('');
 
   useEffect(() => {
-    if (credential && credential != sessionStorage.getItem('bookKeepingCredential')) {
-      sessionStorage.setItem('bookKeepingCredential', credential);
+    if (credential && credential != sessionStorage.getItem('nutritionAnalysisCredential')) {
+      sessionStorage.setItem('nutritionAnalysisCredential', credential);
       setCredential('');
     }
 
-    if (credential || sessionStorage.getItem('bookKeepingCredential')) {
+    if (credential || sessionStorage.getItem('nutritionAnalysisCredential')) {
       window.location.href = './Home';
     }
   }, [credential]);

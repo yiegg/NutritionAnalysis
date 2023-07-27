@@ -29,7 +29,6 @@ const bucketName = process.env.BUCKET_NAME;
 async function deleteFile(userID, fileName) {
   await storage.bucket(bucketName).file(`${userID}/${fileName}`).delete();
 
-//   console.log(`gs://${bucketName}/${fileName} deleted`);
 }
 
 module.exports = deleteFile;

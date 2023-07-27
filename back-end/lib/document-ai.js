@@ -56,7 +56,6 @@ const priceEntityTypes = ['net_amount', 'total_tax_amount', 'total_amount', 'amo
 
 function extractEntities(entities) {
   let selectedEntities = {};
-  let lineItemEntities = [];
   for (const entity of entities) {
       const type = entity.type;
       if (! matchEntityTypes.includes(type)) {
@@ -65,51 +64,7 @@ function extractEntities(entities) {
       selectedEntities[type] = entity.mentionText || entity.normalizedValue.text;
   }
 
-
-
-
-    
-  
-  // selectedEntities['line_items'] = [];
-  // for (const entity of lineItemEntities) {
-  //     let currentLineItemEntity = getNullLineItemObject();
-  //     const lineItemString = entity.lineItemString;
-  //     const lineItemProperties = entity.lineItemProperties;
-  //     currentLineItemEntity['line_string'] = lineItemString;
-  //     for (const property of lineItemProperties) {
-  //         const type = property.type;
-  //         const value = property.mentionText || property.normalizedValue.text;
-  //         switch (type) {
-  //             case "line_item/quantity":
-  //                 currentLineItemEntity['quantity'] = value;
-  //                 break;
-  //             case "line_item/description":
-  //                 if (currentLineItemEntity['description']) {
-  //                     currentLineItemEntity['description'] += ' ';
-  //                 }
-  //                 currentLineItemEntity['description'] += value;
-  //                 break;
-  //             case "line_item/unit_price":
-  //                 currentLineItemEntity['unit_price'] = value;
-  //                 break;
-  //             case "line_item/amount":
-  //                 currentLineItemEntity['amount'] = value;
-  //                 break;
-  //         }
-  //     }
-  //     selectedEntities['line_items'].push(currentLineItemEntity);
-  // }
   return selectedEntities;
-}
-
-function getNullLineItemObject() {
-  return {
-    "line_string": null,
-    "quantity": null,
-    "description": "",
-    "unit_price": null,
-    "amount": null
-  };
 }
 
 module.exports = {analyzeFileByDocumentAI, matchEntityTypes, lineItemEntityTypes, numberEntityTypes, priceEntityTypes};

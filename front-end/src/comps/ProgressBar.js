@@ -6,11 +6,11 @@ import URL from '../config/URLConfig';
 
 export default function ProgressBar({ file, setFile, setStatus }) {
   // TO-DO replace with real post HTTP request
-  async function uploadReceipt(receipt) {
+  async function uploadInfo(info) {
     try {
-      setStatus('Uploading receipt~');
-      const JWT = sessionStorage.getItem('bookKeepingCredential');
-      const storageInfo = await axios.get(URL + 'uploads/static/' + receipt.name, {
+      setStatus('Uploading info~');
+      const JWT = sessionStorage.getItem('nutritionAnalysisCredential');
+      const storageInfo = await axios.get(URL + 'uploads/static/' + info.name, {
         headers: {
           Authorization: `Bearer ${JWT}`,
         },
@@ -18,15 +18,15 @@ export default function ProgressBar({ file, setFile, setStatus }) {
       const bucketFileName = storageInfo.data.bucketFileName;
       const url = storageInfo.data.url;
 
-      let uploadRes = await axios.put(url, receipt, {
+      let uploadRes = await axios.put(url, info, {
         headers: {
           'Content-Type': 'application/octet-stream',
         },
       });
 
-      setStatus('AI analyzing receipt~');
+      setStatus('AI analyzing info~');
       let analyzeRes = await axios.post(
-        URL + 'receipts/',
+        URL + 'info/',
         { bucketFileName: bucketFileName, fileType: 'png' },
         {
           headers: {
@@ -36,7 +36,7 @@ export default function ProgressBar({ file, setFile, setStatus }) {
         },
       );
       setFile(null);
-      alert('New receipt added successfully!');
+      alert('New info added successfully!');
       setTimeout(() => window.location.reload(), 500);
     } catch (error) {
       alert(error.message);
@@ -44,7 +44,7 @@ export default function ProgressBar({ file, setFile, setStatus }) {
   }
 
   useEffect(() => {
-    uploadReceipt(file);
+    uploadInfo(file);
   }, []);
 
   return (

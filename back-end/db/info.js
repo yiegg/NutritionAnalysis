@@ -1,8 +1,8 @@
-const { ReceiptDoesNotExistError } = require('../lib/errors.js');
+const { InfoDoesNotExistError } = require('../lib/errors.js');
 const client = require('../tidb/config.js'); // Replace with your TiDB client module
 const { v4: uuidv4 } = require('uuid');
 
-async function addReceiptInDB(doc) {
+async function addInfoInDB(doc) {
     try {
         const connection = await client.createConnection();
         const result = await connection.execute(`
@@ -24,38 +24,38 @@ async function addReceiptInDB(doc) {
     }
 }
 
-async function getReceiptInDB(receiptID) {
+async function getInfoInDB(infoID) {
     try {
         const connection = await client.createConnection();
         const sql = 'SELECT * FROM info WHERE _id = ?';
         const result = await new Promise((resolve, reject) => {
-            connection.query(sql, [receiptID], function (err, result) {
+            connection.query(sql, [infoID], function (err, result) {
                 if (err) reject(err);
                 resolve(result);
             });
         });
+        
         await connection.end();
 
         if (result.length === 0) {
-            throw new ReceiptDoesNotExistError(`No receipt found for receiptID ${receiptID}!`);
+            throw new InfoDoesNotExistError(`No info found for infoID ${infoID}!`);
         }
 
-        const receipt = result[0];
-        //   console.log(receipt);
-        // Handle the receipt data as needed
-        return receipt;
+        const info = result[0];
+        // Handle the info data as needed
+        return info;
     } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-async function removeReceiptInDB(receiptID) {
+async function removeInfoInDB(infoID) {
     try {
         const connection = await client.createConnection();
         const sql = 'DELETE FROM info WHERE _id = ?';
         const result = await new Promise((resolve, reject) => {
-            connection.query(sql, [receiptID], function (err, result) {
+            connection.query(sql, [infoID], function (err, result) {
                 if (err) reject(err);
                 resolve(result);
             });
@@ -63,7 +63,7 @@ async function removeReceiptInDB(receiptID) {
         await connection.end();
 
         if (result.affectedRows !== 1) {
-            throw new ReceiptDoesNotExistError(`No deletion occurred for deleting ${receiptID}!`);
+            throw new InfoDoesNotExistError(`No deletion occurred for deleting ${infoID}!`);
         }
     } catch (error) {
         console.log(error);
@@ -71,19 +71,19 @@ async function removeReceiptInDB(receiptID) {
     }
 }
 
-async function getReceiptsByUserIdInDB(userID) {
+async function getInfoByUserIdInDB(userID) {
     try {
         const connection = await client.createConnection();
 
-        const getReceiptsQuery = `
+        const getInfoQuery = `
         SELECT i.*
         FROM info i
         JOIN users ur ON i.userID = ur._id
         WHERE ur._id = ?
       `;
-        const getReceiptsParams = [userID];
-        const receiptsResult = await new Promise((resolve, reject) => {
-            connection.query(getReceiptsQuery, getReceiptsParams, function (err, result) {
+        const getInfoParams = [userID];
+        const infoResult = await new Promise((resolve, reject) => {
+            connection.query(getInfoQuery, getInfoParams, function (err, result) {
                 if (err) reject(err);
                 resolve(result);
             });
@@ -91,7 +91,7 @@ async function getReceiptsByUserIdInDB(userID) {
 
         await connection.end();
 
-        return receiptsResult;
+        return infoResult;
     } catch (error) {
         console.log(error);
         throw error;
@@ -99,7 +99,7 @@ async function getReceiptsByUserIdInDB(userID) {
 }
 
 
-async function getReceiptByUserIDAndBucketFileNameInDB(userID, bucketFileName) {
+async function getInfoByUserIDAndBucketFileNameInDB(userID, bucketFileName) {
     try {
         const connection = await client.createConnection();
 
@@ -116,7 +116,7 @@ async function getReceiptByUserIDAndBucketFileNameInDB(userID, bucketFileName) {
         await connection.end();
 
         if (result.length === 0) {
-            throw new ReceiptDoesNotExistError(`No receipt found for userID ${userID} and bucketFileName ${bucketFileName}!`);
+            throw new InfoDoesNotExistError(`No info found for userID ${userID} and bucketFileName ${bucketFileName}!`);
         }
 
         return result[0]
@@ -128,7 +128,7 @@ async function getReceiptByUserIDAndBucketFileNameInDB(userID, bucketFileName) {
 }
 
 
-async function updateReceiptInDB(receiptID, updatedFieldsDoc) {
+async function updateInfoInDB(infoID, updatedFieldsDoc) {
     try {
       const connection = await client.createConnection();
   
@@ -136,7 +136,7 @@ async function updateReceiptInDB(receiptID, updatedFieldsDoc) {
       const params = [
         updatedFieldsDoc.dateLastModified,
         JSON.stringify(updatedFieldsDoc.analyzedResults),
-        receiptID
+        infoID
       ];
   
       const result = await new Promise((resolve, reject) => {
@@ -149,12 +149,12 @@ async function updateReceiptInDB(receiptID, updatedFieldsDoc) {
       await connection.end();
   
       if (result.affectedRows !== 1) {
-        throw new ReceiptDoesNotExistError(`No receipt found for receiptID ${receiptID}!`);
+        throw new InfoDoesNotExistError(`No info found for infoID ${infoID}!`);
       }
   
       return {
         ...updatedFieldsDoc,
-        _id: receiptID,
+        _id: infoID,
         analyzedResults: updatedFieldsDoc.analyzedResults,
       };
     } catch (error) {
@@ -165,12 +165,12 @@ async function updateReceiptInDB(receiptID, updatedFieldsDoc) {
   
 
 module.exports = {
-    addReceiptInDB,
-    getReceiptInDB,
-    removeReceiptInDB,
-    getReceiptsByUserIdInDB,
-    getReceiptByUserIDAndBucketFileNameInDB,
-    updateReceiptInDB,
+    addInfoInDB,
+    getInfoInDB,
+    removeInfoInDB,
+    getInfoByUserIdInDB,
+    getInfoByUserIDAndBucketFileNameInDB,
+    updateInfoInDB,
 };
 
 

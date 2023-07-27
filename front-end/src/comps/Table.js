@@ -16,36 +16,36 @@ import {
 } from '@chakra-ui/react';
 import TableItem from './TableItem';
 
-export default function Table({ setImg, receipts, onAmount }) {
+export default function Table({ setImg, info, onAmount }) {
   const [data, setData] = useState(null);
 
   useEffect(() => {
     async function getDocs() {
-      const extractedData = receipts.map((receipt) => ({
-        amount: receipt.analyzedResults.AMOUNT,
-        calories: receipt.analyzedResults.CALORIES,
-        carbonhydrate: receipt.analyzedResults.CARBOHYDRATE,
-        fat: receipt.analyzedResults.FAT,
-        protein: receipt.analyzedResults.PROTEIN,
-        sodium: receipt.analyzedResults.SODIUM,
-        date: new Date(receipt.dateAdded).toLocaleDateString(),
-        fileName: receipt.fileName,
+      const extractedData = info.map((info) => ({
+        amount: info.analyzedResults.AMOUNT,
+        calories: info.analyzedResults.CALORIES,
+        carbonhydrate: info.analyzedResults.CARBOHYDRATE,
+        fat: info.analyzedResults.FAT,
+        protein: info.analyzedResults.PROTEIN,
+        sodium: info.analyzedResults.SODIUM,
+        date: new Date(info.dateAdded).toLocaleDateString(),
+        fileName: info.fileName,
         url: (
           <img
-            src={receipt.imageURL}
-            alt="receipt photo"
-            onClick={() => setImg(receipt.imageURL)}
+            src={info.imageURL}
+            alt="info photo"
+            onClick={() => setImg(info.imageURL)}
             width="200"
             height="200"
           />
         ),
-        id: receipt._id,
-        multiplier: localStorage.getItem(receipt.fileName.toString()) || 1, // Default multiplier is set to 1
+        id: info._id,
+        multiplier: localStorage.getItem(info.fileName.toString()) || 1, // Default multiplier is set to 1
       }));
       setData(extractedData);
     }
     getDocs();
-  }, [receipts, setImg]);
+  }, [info, setImg]);
 
   useEffect(() => {
     if (!data) return;
@@ -79,12 +79,12 @@ export default function Table({ setImg, receipts, onAmount }) {
             <Tr>
               <Th>Food</Th>
               <Th>Date</Th>
-              <Th>Amount</Th>
-              <Th>Calories</Th>
-              <Th>Carbonhydrate</Th>
-              <Th>Fat</Th>
-              <Th>Protein</Th>
-              <Th>Sodium</Th>
+              <Th>Unit</Th>
+              <Th>Calories (cal)</Th>
+              <Th>Carbonhydrate (g)</Th>
+              <Th>Fat (g)</Th>
+              <Th>Protein (g)</Th>
+              <Th>Sodium (mg)</Th>
               <Th>Image</Th>
               <Th>Delete</Th>
               <Th>Multiplier</Th>

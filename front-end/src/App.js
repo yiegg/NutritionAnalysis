@@ -21,7 +21,7 @@ function App() {
         <Route
           path="/Home"
           element={
-            sessionStorage.getItem("bookKeepingCredential") ? (
+            sessionStorage.getItem("nutritionAnalysisCredential") ? (
               <Home />
             ) : (
               <Navigate to="/login" />

@@ -2,6 +2,7 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import { Button, Select, Td, Tr } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import URL from '../config/URLConfig';
 
 const TableItem = ({ item, onMultiplierChange }) => {
   const [multiplier, setMultiplier] = useState(
@@ -10,13 +11,13 @@ const TableItem = ({ item, onMultiplierChange }) => {
 
   async function deleteRequest(id) {
     try {
-      const JWT = sessionStorage.getItem("bookKeepingCredential");
-      await axios.delete(URL + "receipts/" + id, {
+      const JWT = sessionStorage.getItem("nutritionAnalysisCredential");
+      await axios.delete(URL + "info/" + id, {
         headers: {
           Authorization: `Bearer ${JWT}`,
         },
       });
-      alert("Receipt removed successfully!");
+      alert("Info removed successfully!");
       setTimeout(() => window.location.reload(), 500);
     } catch (error) {
       alert(error.message);
@@ -33,11 +34,11 @@ const TableItem = ({ item, onMultiplierChange }) => {
     deleteRequest(id);
   }
 
-  const calculatedCalories = item.calories * multiplier || "-";
-  const calculatedCarbonhydrate = item.carbonhydrate * multiplier || "-";
-  const calculatedFat = item.fat * multiplier || "-";
-  const calculatedProtein = item.protein * multiplier || "-";
-  const calculatedSodium = item.sodium * multiplier || "-";
+  const calculatedCalories = item.calories? (item.calories * multiplier) : "0";
+  const calculatedCarbonhydrate = item.carbonhydrate? (item.carbonhydrate.replace("g", "") * multiplier): "-";
+  const calculatedFat = item.fat? (item.fat.replace("g", "") * multiplier) : "-";
+  const calculatedProtein = item.protein? (item.protein.replace("g", "") * multiplier) : "-";
+  const calculatedSodium = item.sodium? (item.sodium.replace("mg", "") * multiplier) : "-";
 
   useEffect(() => {
     localStorage.setItem(item.fileName.toString(), multiplier);
@@ -47,7 +48,8 @@ const TableItem = ({ item, onMultiplierChange }) => {
 
   return (
     <Tr key={item.id}>
-      <Td>{item.fileName.slice(0, -5)}</Td>
+      {console.log(item.fileName)}
+      <Td>{item.fileName.split(".")[0]}</Td>
       <Td>{item.date.substring(0, 10)}</Td>
       <Td>{item.amount || "-"}</Td>
       <Td>{calculatedCalories}</Td>

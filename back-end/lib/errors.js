@@ -21,17 +21,17 @@ class UserDoesNotExistError extends DoesNotExistError {
     }
 }
 
-class ReceiptDoesNotExistError extends DoesNotExistError {
+class InfoDoesNotExistError extends DoesNotExistError {
     constructor(message) {
         super(message);
-        this.name = 'ReceiptDoesNotExistError';
+        this.name = 'InfoDoesNotExistError';
     }
 }
 
-class UserReceiptArrayUpdateFailureError extends Error {
+class UserInfoArrayUpdateFailureError extends Error {
     constructor(message) {
         super(message);
-        this.name = 'UserReceiptArrayUpdateFailureError';
+        this.name = 'UserInfoArrayUpdateFailureError';
         this.status = 400;
     }
 }
@@ -90,5 +90,5 @@ class LocalStorageFileDoesNotExistError extends FileDoesNotExistError {
     }
 }
 
-module.exports = {DuplicateUsernameError, UserDoesNotExistError, ReceiptDoesNotExistError, UserReceiptArrayUpdateFailureError, AuthenticationFailureError, PasswordAuthenticationFailureError, 
+module.exports = {DuplicateUsernameError, UserDoesNotExistError, InfoDoesNotExistError, UserInfoArrayUpdateFailureError, AuthenticationFailureError, PasswordAuthenticationFailureError, 
     JWTAuthenticationFailureError, V4SignedURLUnavailableError, CloudStorageFileDoesNotExistError, LocalStorageFileDoesNotExistError};

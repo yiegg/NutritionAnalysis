@@ -1,11 +1,11 @@
 const express = require('express');
 const { requireAuth } = require('../lib/auth');
 const bodyParser = require('body-parser');
-const { addReceiptInDB, getReceiptInDB, removeReceiptInDB, getReceiptsByUserIdInDB, getReceiptByUserIDAndBucketFileNameInDB, updateReceiptInDB } = require('../db/receipts');
+const { addInfoInDB, getInfoInDB, removeInfoInDB, getInfoByUserIdInDB, getInfoByUserIDAndBucketFileNameInDB, updateInfoInDB } = require('../db/info');
 const getV4ReadSignedUrl = require('../lib/generate-v4-read-signed-url');
 const {analyzeFileByDocumentAI, matchEntityTypes, lineItemEntityTypes, numberEntityTypes, priceEntityTypes} = require('../lib/document-ai');
 const {fileTypeChecker, getContentType} = require('../lib/support-file-type');
-const { addReceiptToUserInDB, removeReceiptFromUserInDB } = require('../db/users');
+const { addInfoToUserInDB, removeInfoFromUserInDB } = require('../db/users');
 const deleteFile = require('../lib/cloud-storage-file-delete');
 
 const bucketName = process.env.BUCKET_NAME;
@@ -21,7 +21,7 @@ let bucketFileNameChecker = (req, res, next) => {
     next();
 };
 
-let modifiedReceiptContentFilter = (req, res, next) => {
+let modifiedInfoContentFilter = (req, res, next) => {
     const requestBody = req.body;
     const analyzedResults = requestBody.analyzedResults;
     remove_key = [];
@@ -66,7 +66,7 @@ let modifiedReceiptContentFilter = (req, res, next) => {
     next();
 };
 
-let userAddReceiptRoute = async (req, res) => { // Probably add a middleware to process the record metadata.
+let userAddInfoRoute = async (req, res) => { // Probably add a middleware to process the record metadata.
     const userID = req.user.userID;
     const requestBody = req.body;
     // const contentType = getContentType(requestBody.fileType);
@@ -78,115 +78,116 @@ let userAddReceiptRoute = async (req, res) => { // Probably add a middleware to 
     const dateLastModified = dateAdded;
     const imageURL = `https://storage.cloud.google.com/${bucketName}/${userID}/${bucketFileName}`; // Incorrect URL leads to 404 not found! // Check if necessary to record.
     // Document AI
-    let receiptContent;
+    let infoContent;
     try {
-        receiptContent = await analyzeFileByDocumentAI(userID, bucketFileName, contentType); // Call Document AI!
+        infoContent = await analyzeFileByDocumentAI(userID, bucketFileName, contentType); // Call Document AI!
     } catch (error) {
         res.status(error.status || 400).send({...error, message: error.message});
         return;
     }
     // Add to MongoDB Atlas
-    const doc = {userID, contentType, fileName, bucketFileName, imageURL, dateAdded, dateLastModified, analyzedResults: receiptContent['selectedEntities']};
-    res.status(201).send({...doc, message: "The receipt record will appear on your account in a few seconds."}); // check receiptID key repetition in returned doc
+    const doc = {userID, contentType, fileName, bucketFileName, imageURL, dateAdded, dateLastModified, analyzedResults: infoContent['selectedEntities']};
+    res.status(201).send({...doc, message: "The info record will appear on your account in a few seconds."}); // check infoID key repetition in returned doc
     try {
-        const receiptID = await addReceiptInDB({...doc, analyzedResults: receiptContent});
-        // const receiptIDs = await addReceiptToUserInDB(userID, receiptID);
+        const infoID = await addInfoInDB({...doc, analyzedResults: infoContent});
+        // const infoIDs = await addInfoToUserInDB(userID, infoID);
         // const clientGetImageURL = await getV4ReadSignedUrl(userID, bucketFileName); // check if necessary, or return to client an image processed by the Document AI
     } catch (error) {
         console.log({...error, message: error.message});
     }
 };
 
-let userRemoveReceiptRoute = async (req, res) => {
+let userRemoveInfoRoute = async (req, res) => {
     const userID = req.user.userID;
-    const receiptID = req.params.receipt_id;
+    const infoID = req.params.info_id;
+    console.log(userID);
     // Get document from MongoDB Atlas
-    let receiptRecord;
+    let infoRecord;
     try {
-        receiptRecord = await getReceiptInDB(receiptID);
+        infoRecord = await getInfoInDB(infoID);
     } catch (error) {
-        res.status(error.status || 400).send({...error, message: error.message || `Error in userRemoveReceiptRoute() for user ${userID} retrieving record ${receiptID} in DB!`});
+        res.status(error.status || 400).send({...error, message: error.message || `Error in userRemoveInfoRoute() for user ${userID} retrieving record ${infoID} in DB!`});
         return;
     }
-    if (userID !== receiptRecord.userID) {
-        res.status(404).send({"message": `User ${userID} does not have receipt record ${receiptID}!`});
+    if (userID !== infoRecord.userID) {
+        res.status(404).send({"message": `User ${userID} does not have info record ${infoID}!`});
         return;
     }
     // Delete Cloud Storage File
-    const bucketFileName = receiptRecord.bucketFileName;
+    const bucketFileName = infoRecord.bucketFileName;
     try {
         await deleteFile(userID, bucketFileName);
     } catch (error) {
-        res.status(error.status || 400).send({...error, message: error.message || `Error in userRemoveReceiptRoute() for user ${userID} deleting static content in Cloud Storage for receipt record ${receiptID}!`});
+        res.status(error.status || 400).send({...error, message: error.message || `Error in userRemoveInfoRoute() for user ${userID} deleting static content in Cloud Storage for info record ${infoID}!`});
         return;
     }
     // Remove from MongoDB Atlas
     try {
-        // await removeReceiptInDB(receiptID);
-        // const receiptIDs = await removeReceiptFromUserInDB(userID, receiptID);
-        // res.status(200).send({receiptIDs});
-        await removeReceiptInDB(receiptID);
-        // const receiptIDs = await removeReceiptFromUserInDB(userID, receiptID);
-        res.status(200).send({receiptID});
+        // await removeInfoInDB(infoID);
+        // const infoIDs = await removeInfoFromUserInDB(userID, infoID);
+        // res.status(200).send({infoIDs});
+        await removeInfoInDB(infoID);
+        // const infoIDs = await removeInfoFromUserInDB(userID, infoID);
+        res.status(200).send({infoID});
     } catch (error) {
-        res.status(error.status || 400).send({...error, message: error.message || `Error in userRemoveReceiptRoute() for user ${userID} removing record ${receiptID} in DB!`});
+        res.status(error.status || 400).send({...error, message: error.message || `Error in userRemoveInfoRoute() for user ${userID} removing record ${infoID} in DB!`});
     }
 };
 
-let userGetReceiptRoute = async (req, res) => {
+let userGetInfoRoute = async (req, res) => {
     const userID = req.user.userID;
-    const receiptID = req.params.receipt_id;
+    const infoID = req.params.info_id;
     // Get document from MongoDB Atlas
-    let receiptRecord;
+    let infoRecord;
     try {
-        receiptRecord = await getReceiptInDB(receiptID);
+        infoRecord = await getInfoInDB(infoID);
     } catch (error) {
-        res.status(error.status || 400).send({...error, message: error.message || `Error in userGetReceiptRoute() for user ${userID} retrieving record ${receiptID} in DB!`});
+        res.status(error.status || 400).send({...error, message: error.message || `Error in userGetInfoRoute() for user ${userID} retrieving record ${infoID} in DB!`});
         return;
     }
-    if (userID !== receiptRecord.userID) {
-        res.status(404).send({"message": `User ${userID} does not have receipt record ${receiptID}!`});
+    if (userID !== infoRecord.userID) {
+        res.status(404).send({"message": `User ${userID} does not have info record ${infoID}!`});
         return;
     }
-    res.status(200).send({...receiptRecord, analyzedResults: receiptRecord.analyzedResults['selectedEntities']});
+    res.status(200).send({...infoRecord, analyzedResults: infoRecord.analyzedResults['selectedEntities']});
 };
 
-let userGetAllReceiptsRoute = async (req, res) => {
+let userGetAllInfoRoute = async (req, res) => {
     const userID = req.user.userID;
     // Get document from MongoDB Atlas
-    let receiptRecords;
+    let infoRecords;
     try {
         // changed the function name
-        receiptRecords = await getReceiptsByUserIdInDB(userID);
+        infoRecords = await getInfoByUserIdInDB(userID);
     } catch (error) {
-        res.status(error.status || 400).send({...error, message: error.message || `Error in userGetAllReceiptsRoute() for user ${userID} retrieving record ${receiptID} in DB!`});
+        res.status(error.status || 400).send({...error, message: error.message || `Error in userGetAllInfoRoute() for user ${userID} retrieving record ${infoID} in DB!`});
         return;
     }
-    receiptRecords = receiptRecords.map((record) => {
+    infoRecords = infoRecords.map((record) => {
         return {...record, analyzedResults: record.analyzedResults['selectedEntities']};
     });
-    res.status(200).send({expenseSummary: calculateExpenseSummary(receiptRecords), receiptRecords});
+    res.status(200).send({expenseSummary: calculateExpenseSummary(infoRecords), infoRecords});
 };
 
-let userModifyReceiptRoute = async (req, res) => {
+let userModifyInfoRoute = async (req, res) => {
     const userID = req.user.userID;
     const modifiedAnalyzedResults = req.modifiedAnalyzedResults;
-    let receiptID;
+    let infoID;
     try {
-        receiptID = req.params.receipt_id || (((await getReceiptByUserIDAndBucketFileNameInDB(userID, req.body.bucketFileName))?._id || '').toString());
-        if (! receiptID) {
-            res.status(404).send({message: `Cannot find receipt: either receipt_id ${req.params.receipt_id} is missing in URL, or user ${userID} does not have receipt with bucketFileName ${req.body.bucketFileName}. If the receipt has been just added, please wait for a few more seconds and re-try.`});
+        infoID = req.params.info_id || (((await getInfoByUserIDAndBucketFileNameInDB(userID, req.body.bucketFileName))?._id || '').toString());
+        if (! infoID) {
+            res.status(404).send({message: `Cannot find info: either info_id ${req.params.info_id} is missing in URL, or user ${userID} does not have info with bucketFileName ${req.body.bucketFileName}. If the info has been just added, please wait for a few more seconds and re-try.`});
             return;
         }
     } catch (error) {
-        res.status(error.status || 400).send({...error, message: error.message || `Error in userModifyReceiptRoute() for user ${userID} retrieving record by bucketFileName ${req.body.bucketFileName} in DB!`});
+        res.status(error.status || 400).send({...error, message: error.message || `Error in userModifyInfoRoute() for user ${userID} retrieving record by bucketFileName ${req.body.bucketFileName} in DB!`});
         return;
     }
     try {
-        const updatedReceipt = await updateReceiptInDB(receiptID, {dateLastModified: new Date(), "analyzedResults.selectedEntities": modifiedAnalyzedResults});
-        res.status(200).send({...updatedReceipt, analyzedResults: updatedReceipt.analyzedResults['selectedEntities']});
+        const updatedInfo = await updateInfoInDB(infoID, {dateLastModified: new Date(), "analyzedResults.selectedEntities": modifiedAnalyzedResults});
+        res.status(200).send({...updatedInfo, analyzedResults: updatedInfo.analyzedResults['selectedEntities']});
     } catch (error) {
-        res.status(error.status || 400).send({...error, message: error.message || `Error in userModifyReceiptRoute() for user ${userID} updating receipt ${receiptID} in DB!`});
+        res.status(error.status || 400).send({...error, message: error.message || `Error in userModifyInfoRoute() for user ${userID} updating info ${infoID} in DB!`});
     }
 };
 
@@ -202,12 +203,12 @@ let getCloudStorageReadURLRoute = async (req, res) => {
     res.status(201).send({url});
 };
 
-let calculateExpenseSummary = (receiptRecords) => {
+let calculateExpenseSummary = (infoRecords) => {
     let expenseSummary = {
         expenseSum: 0,
         years: {}
     };
-    for (const record of receiptRecords) {
+    for (const record of infoRecords) {
         const date = record.analyzedResults.invoice_date || record.dateAdded.toISOString().substring(0, 10);
         const year = parseInt(date.substring(0, 4));
         const month = parseInt(date.substring(5, 7));
@@ -235,20 +236,20 @@ function isNumericOrNull(str) {
     return !isNaN(str) && !isNaN(parseFloat(str));
 };
 
-let receiptsRouter = express.Router();
+let infoRouter = express.Router();
 
-receiptsRouter.route('/')
-    .get(requireAuth, userGetAllReceiptsRoute)
-    .post(requireAuth, jsonBodyParser, bucketFileNameChecker, fileTypeChecker, userAddReceiptRoute)
-    .patch(requireAuth, jsonBodyParser, bucketFileNameChecker, modifiedReceiptContentFilter, userModifyReceiptRoute);
+infoRouter.route('/')
+    .get(requireAuth, userGetAllInfoRoute)
+    .post(requireAuth, jsonBodyParser, bucketFileNameChecker, fileTypeChecker, userAddInfoRoute)
+    .patch(requireAuth, jsonBodyParser, bucketFileNameChecker, modifiedInfoContentFilter, userModifyInfoRoute);
 
-receiptsRouter.route('/:receipt_id')
-    .get(requireAuth, userGetReceiptRoute)
-    .delete(requireAuth, userRemoveReceiptRoute)
-    .patch(requireAuth, jsonBodyParser, modifiedReceiptContentFilter, userModifyReceiptRoute);
+infoRouter.route('/:info_id')
+    .get(requireAuth, userGetInfoRoute)
+    .delete(requireAuth, userRemoveInfoRoute)
+    .patch(requireAuth, jsonBodyParser, modifiedInfoContentFilter, userModifyInfoRoute);
 
-receiptsRouter.route('/static/:bucketfilename')
+infoRouter.route('/static/:bucketfilename')
     .get(requireAuth, getCloudStorageReadURLRoute);
 
 
-module.exports = receiptsRouter;
+module.exports = infoRouter;

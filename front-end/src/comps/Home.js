@@ -10,22 +10,22 @@ import Logo from '../static/logo.jpg';
 
 function Home() {
   const [img, setImg] = useState(null);
-  const [receipts, setReceipts] = new useState([]);
+  const [info, setInfo] = new useState([]);
   const [amount, setAmount] = new useState(0);
 
   async function fetchRecords() {
-    const JWT = sessionStorage.getItem('bookKeepingCredential');
-    const rawRecords = await axios.get(URL + 'receipts', {
+    const JWT = sessionStorage.getItem('nutritionAnalysisCredential');
+    const rawRecords = await axios.get(URL + 'info', {
       headers: {
         Authorization: `Bearer ${JWT}`,
       },
     });
-    setReceipts(rawRecords.data.receiptRecords);
+    setInfo(rawRecords.data.infoRecords);
     // setAmount(rawRecords.data.expenseSummary.expenseSum);
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem('bookKeepingCredential');
+    sessionStorage.removeItem('nutritionAnalysisCredential');
     window.location.href = '/Login';
   };
 
@@ -34,11 +34,11 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    console.log(receipts);
-  }, [receipts]);
+    console.log(info);
+  }, [info]);
 
   return (
-    receipts && (
+    info && (
       <Flex w={'100%'} p={10} alignContent={'center'} justifyContent={'center'}>
         <Flex w={'80%'} direction={'column'} alignContent={'center'} justifyContent={'center'}>
           <Divider />
@@ -60,7 +60,7 @@ function Home() {
           <TotalCalories amount={amount} />
           <UploadForm />
 
-          <Table setImg={setImg} receipts={receipts} onAmount={setAmount} />
+          <Table setImg={setImg} info={info} onAmount={setAmount} />
 
           {img && <Modal src={img} setImg={setImg} />}
         </Flex>
